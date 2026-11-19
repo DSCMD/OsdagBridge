@@ -99,9 +99,10 @@ This section documents all inputs provided to OsdagBridge. User-provided inputs 
 \begin{table}[H]
 \caption{\textbf{Project Location}}
 \label{subsec:project-location}
-\begin{tabular}{|L{5.5cm}|L{8.5cm}|}
+\begin{tabular}{|L{5.4cm}|L{9.5cm}|}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{Project Location} & """ + _tex(m.project_location) + r""" \\
 \hline
@@ -120,9 +121,10 @@ This section documents all inputs provided to OsdagBridge. User-provided inputs 
 \begin{table}[H]
 \caption{\textbf{Bridge Geometry}}
 \label{subsec:bridge-geometry}
-\begin{tabular}{|L{5.5cm}|L{8.5cm}|}
+\begin{tabular}{|L{5.4cm}|L{9.5cm}|}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{Type of Structure} & """ + (_render_value(input_dict, KEY_STRUCTURE_TYPE)) + r""" \\
 \hline
@@ -143,9 +145,10 @@ This section documents all inputs provided to OsdagBridge. User-provided inputs 
 \begin{table}[H]
 \caption{\textbf{Material Selection}}
 \label{subsec:material}
-\begin{tabular}{|L{5.5cm}|L{8.5cm}|}
+\begin{tabular}{|L{5.4cm}|L{9.5cm}|}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{Girder Steel Grade (IS 2062)} & """ + (_render_value(input_dict, KEY_GIRDER)) + r""" \\
 \hline
@@ -167,10 +170,11 @@ Where the user has modified additional inputs, those values are reported here. W
 
 \vspace{0.8cm}
 
-\begin{longtable}{|L{5.5cm}|p{10.0cm}|}
+\begin{longtable}{|L{5.4cm}|L{9.5cm}|}
 \caption{\textbf{Typical Section Details}}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{Overall Bridge Width (m)} & """ + (_render_value(input_dict, KEY_TS_OVERALL_WIDTH)) + r""" \\[6pt]
 \hline
@@ -190,10 +194,11 @@ Where the user has modified additional inputs, those values are reported here. W
 
 \vspace{0.8em}
 
-\begin{longtable}{|L{5.5cm}|p{10.0cm}|}
+\begin{longtable}{|L{5.4cm}|L{9.5cm}|}
 \caption{\textbf{Components Details}}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{Crash Barrier Type} & """ + (_render_value(input_dict, KEY_CB_TYPE)) + r""" \\[6pt]
 \hline
@@ -237,23 +242,40 @@ def _girder_tables(input_dict, n_girders):
         )
     ]
 
-    # Helper: one girder-dimension row
+    def _m_to_mm_str(val):
+        if val in (None, ""):
+            return ""
+        try:
+            num = float(val) * 1000.0
+            return f"{num:g} mm"
+        except (TypeError, ValueError):
+            return _tex(str(val))
+
+    def _m_to_mm_str(val):
+        if val in (None, ""):
+            return ""
+        try:
+            num = float(val) * 1000.0
+            return f"{num:g} mm"
+        except (TypeError, ValueError):
+            return _tex(str(val))
+
+    # Helper: one girder-dimension row (section_input values in input_dict are in meters -> mm)
     def _dim_row(g_lbl, i):
-        return (g_lbl + r""" & """
-                + (_render_value(input_dict, f"{KEY_MP_GIRDER_DEPTH}.G{i}.M1", ' mm'))
-                + r""" & """
-                + (_render_value(input_dict, f"{KEY_MP_GIRDER_WEB_THICKNESS}.G{i}.M1", ' mm'))
-                + r""" & """
-                + (_render_value(input_dict, f"{KEY_MP_GIRDER_TOP_FLANGE_WIDTH}.G{i}.M1", ' mm'))
-                + ', '
-                + (_render_value(input_dict, f"{KEY_MP_GIRDER_TOP_FLANGE_THICKNESS}.G{i}.M1", ' mm'))
-                + r""" & """
-                + (_render_value(input_dict, f"{KEY_MP_GIRDER_BOTTOM_FLANGE_WIDTH}.G{i}.M1", ' mm'))
-                + ', '
-                + (_render_value(input_dict, f"{KEY_MP_GIRDER_BOTTOM_FLANGE_THICKNESS}.G{i}.M1", ' mm'))
-                + r""" \\[8pt]
-\hline
-""")
+        d_mm   = _m_to_mm_str(input_dict.get(f"{KEY_MP_GIRDER_DEPTH}.G{i}.M1"))
+        tw_mm  = _m_to_mm_str(input_dict.get(f"{KEY_MP_GIRDER_WEB_THICKNESS}.G{i}.M1"))
+        btf_mm = _m_to_mm_str(input_dict.get(f"{KEY_MP_GIRDER_TOP_FLANGE_WIDTH}.G{i}.M1"))
+        ttf_mm = _m_to_mm_str(input_dict.get(f"{KEY_MP_GIRDER_TOP_FLANGE_THICKNESS}.G{i}.M1"))
+        bbf_mm = _m_to_mm_str(input_dict.get(f"{KEY_MP_GIRDER_BOTTOM_FLANGE_WIDTH}.G{i}.M1"))
+        tbf_mm = _m_to_mm_str(input_dict.get(f"{KEY_MP_GIRDER_BOTTOM_FLANGE_THICKNESS}.G{i}.M1"))
+        return (
+            g_lbl
+            + r" & " + d_mm
+            + r" & " + tw_mm
+            + r" & " + btf_mm + ", " + ttf_mm
+            + r" & " + bbf_mm + ", " + tbf_mm
+            + r" \\[8pt]\n\hline\n"
+        )
 
     # Helper: one general-info row
     def _gen_row(g_lbl, m_id, i):
@@ -388,10 +410,10 @@ def _bracing_tables(input_dict, n_girders):
 \setlength\LTleft{0pt}
 \setlength\LTright{\fill}
 
-\begin{longtable}{|L{2.2cm}|L{2.2cm}|L{3.0cm}|L{2.5cm}|C{1.8cm}|C{1.8cm}|}
+\begin{longtable}{|L{2.4cm}|L{2.4cm}|L{3.1cm}|L{4.8cm}|C{2.2cm}|}
 \caption{\textbf{Member Properties: Cross Bracing Details}}
 \hline
-\textbf{Location} & \textbf{Member IDs} & \textbf{Type of Bracing} & \textbf{Bracing Section} & \textbf{Spacing (m)} \\
+\textbf{Location} & \textbf{Member IDs} & \textbf{Type of Bracing} & \textbf{Bracing Section} & \textbf{Spacing (m)} \\[6pt]
 \hline
 """
 + cb_rows
@@ -403,10 +425,10 @@ def _bracing_tables(input_dict, n_girders):
 \setlength\LTleft{0pt}
 \setlength\LTright{\fill}
 
-\begin{longtable}{|L{2.2cm}|L{2.2cm}|L{3.0cm}|L{2.5cm}|C{1.8cm}|C{1.8cm}|}
+\begin{longtable}{|L{2.5cm}|L{2.5cm}|L{3.5cm}|L{6.4cm}|}
 \caption{\textbf{Member Properties: End Diaphragm Details}}
 \hline
-\textbf{Location} & \textbf{Member IDs} & \textbf{Type of Bracing} & \textbf{Bracing Section} \\
+\textbf{Location} & \textbf{Member IDs} & \textbf{Type of Bracing} & \textbf{Bracing Section} \\[6pt]
 \hline
 """
 + ed_rows
@@ -423,10 +445,11 @@ def _shear_connector_table(input_dict, output_dict=None):
 \vspace{2.2em}
 
 \vspace{0.4em}
-\begin{longtable}{|L{5.5cm}|p{10.0cm}|}
+\begin{longtable}{|L{5.4cm}|L{9.5cm}|}
 \caption{\textbf{Shear Connector Details}}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{Stud Diameter (mm)} & """ + (_render_value(od, KEY_SD_SHEAR_DIAMETER, ' mm')) + r""" \\[6pt]
 \hline
@@ -451,10 +474,11 @@ def _safety_factors_table(input_dict):
 \noindent\textit{Note: All values are per IRC 22 Table 1 unless user-modified.}
 
 \vspace{0.4em}
-\begin{longtable}{|L{5.5cm}|p{10.0cm}|}
+\begin{longtable}{|L{5.4cm}|L{9.5cm}|}
 \caption{\textbf{Partial Safety Factors}}
 \hline
-\textbf{parameter} & \textbf{value} \\
+\rowcolor{osdagTableHeader}
+\textbf{Parameter} & \textbf{Value} \\
 \hline
 \textnormal{$\gamma_{M0}$ (Yielding / Buckling)} & """ + (_render_value(input_dict, KEY_DO_GAMMA_M0)) + r""" \\[6pt]
 \hline

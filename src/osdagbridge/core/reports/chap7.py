@@ -7,7 +7,7 @@ def ch7_quantities(input_dict):
 
 \begingroup
 \setlength{\tabcolsep}{3.5pt}
-\begin{longtable}{|C{1.0cm}|L{3.8cm}|C{2.6cm}|C{1.8cm}|C{1.8cm}|C{1.8cm}|C{1.8cm}|}
+\begin{longtable}{|C{0.9cm}|L{3.7cm}|C{2.4cm}|C{1.6cm}|C{1.8cm}|C{1.9cm}|C{2.0cm}|}
 \hline
 \textbf{S.N.} & \textbf{Item Description} & \textbf{Volume} & \textbf{Quantity} & \textbf{Total Volume} & \textbf{Weight (MT)} & \textbf{Total Weight (MT)} \\
 \hline
